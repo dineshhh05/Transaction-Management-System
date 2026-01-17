@@ -1,3 +1,26 @@
 spring:
   application:
     name: tms
+
+ # ---------- PostgreSQL ----------
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tmsdb
+    username: postgres
+
+    # password ommited here, will be in local file
+    
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # auto-creates tables from your entities
+    show-sql: true       # optional, logs SQL queries in the console
+
+
+  # ---------- Redis ----------
+  redis:
+    host: localhost
+    port: 6379
+
+server:
+  port: 8080
