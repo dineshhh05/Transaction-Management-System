@@ -34,3 +34,4 @@ build/
 
 # Local sensitive configuration
 src/main/resources/application-local.yaml
+.DS_Store
