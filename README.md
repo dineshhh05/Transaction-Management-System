@@ -2,7 +2,7 @@
 
 > ⚠️ **Project Status: Design Phase**
 >
-> This repository currently reflects **enterprise-style system design, architecture planning, and implementation intent**. Core functionality has **not yet been implemented**. Development will follow an incremental, production-minded approach.
+> This repository currently reflects **enterprise-style system design, and architecture planning**. Core functionality is **in development**. Development will follow an incremental, production-minded approach.
 
 ---
 
@@ -16,6 +16,7 @@ The project emphasizes:
 * **Clear separation of concerns**
 * **Deterministic, auditable transaction processing**
 * **Scalability and regulatory awareness**
+* **ACID compliance**
 
 TMS is intentionally structured to align with **banking-grade engineering standards** rather than startup-style rapid prototyping.
 
