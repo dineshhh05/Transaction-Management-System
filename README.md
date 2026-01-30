@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The **Transaction Management System (TMS)** is an enterprise-oriented backend system designed to model how large financial institutions—such as **TD Bank**—ingest, process, evaluate, and monitor financial transactions.
+The **Transaction Management System (TMS)** is an enterprise-oriented backend system designed to model how large financial institutions ingest, process, evaluate, and monitor financial transactions.
 
 The project emphasizes:
 
