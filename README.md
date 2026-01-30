@@ -143,7 +143,7 @@ This layered design mirrors **banking backend architectures**, prioritizing main
 * [x] Business requirements defined
 * [x] Architecture aligned with enterprise banking systems
 * [x] Technology stack selected
-* [ ] Database schema implementation
+* [-] Database schema implementation
 * [ ] API implementation
 * [ ] Risk engine implementation
 * [ ] Security hardening
