@@ -1,8 +1,10 @@
-package com.dinesh.tms.model;
+package com.dinesh.tms.transaction.model;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
+
+import com.dinesh.tms.account.model.Account;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,16 +25,20 @@ public class Transaction {
     private UUID id;
 
     // Each transaction has one sender and one reciver but each sender and reciver can have multiple transactions
-    // LAZY fetch to avoid loading full account data when not needed
+    // transaction (M) <-----> (1) sender
+    // transaction (M) <-----> (1) reciver
+    // Lazy fetch to avoid loading full account data when not needed
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id")
     private Account sender;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_id")
     private Account receiver;
 
 
-    @Column(precision = 19, scale = 4)
+    @Column(precision = 19, scale = 2)
     private BigDecimal amount;
 
     private Instant initiatedDate;
@@ -47,6 +53,23 @@ public class Transaction {
     // No-args constructor 
     public Transaction(){}
 
+    public Transaction(Account sender, 
+        Account receiver, 
+        BigDecimal amount, 
+        Instant initiatedDate, 
+        Instant completionDate, 
+        TransactionStatus status, 
+        String description){
+
+            this.receiver = receiver;
+            this.sender = sender;
+            this.amount = amount;
+            this.initiatedDate = initiatedDate;
+            this.completionDate = completionDate;
+            this.status = status;
+            this.description = description;
+    }
+
 
     // Getters
     public UUID getTransactionID() {return id;}
@@ -58,7 +81,7 @@ public class Transaction {
     public TransactionStatus getTransactionStatus() {return status;}
     public String getDescription() {return description;}
 
-    // No setters to enforce immutability
+    // Setters
 
 
 
