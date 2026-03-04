@@ -36,7 +36,4 @@ public class UserController {
             .status(HttpStatus.CREATED)
             .body(response);
     }
-
-
-    
 }
