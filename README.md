@@ -1,192 +1,101 @@
 # Transaction Management System (TMS)
 
-> ⚠️ **Project Status: Design Phase**
->
-> This repository currently reflects **enterprise-style system design, and architecture planning**. Core functionality is **in development**. Development will follow an incremental, production-minded approach.
+> ⚠️ **Status: In Development**
+
+A high-fidelity system designed to simulate real-world banking operations — secure, reliable, and consistent handling of money transfers. TMS supports concurrent transactions, prevents duplicates, and maintains integrity under failure scenarios, demonstrating production-grade financial system behavior.
 
 ---
 
-## Executive Summary
+## Features & Scope
 
-The **Transaction Management System (TMS)** is an enterprise-oriented backend system designed to model how large financial institutions ingest, process, evaluate, and monitor financial transactions.
-
-The project emphasizes:
-
-* **Reliability and correctness over experimentation**
-* **Clear separation of concerns**
-* **Deterministic, auditable transaction processing**
-* **Scalability and regulatory awareness**
-* **ACID compliance**
-
-TMS is intentionally structured to align with **banking-grade engineering standards** rather than startup-style rapid prototyping.
+- **Account Management** — Create and manage user accounts with balance tracking
+- **Atomic Transfers** — Ensures consistency via database transactions with rollback on failure
+- **Concurrency Safety** — Handles multiple concurrent transactions using optimistic/pessimistic locking
+- **Idempotency** — Prevents duplicate transactions through unique request ID handling
+- **Audit & Logging** — Append only audit trail for all necessary events.
+- **Deployment Ready** — Dockerized for local or cloud deployment, with logging and health checks
+- **Tested & Documented** — Unit and integration tests included; Swagger UI for API documentation
 
 ---
 
-## Technology Stack (Planned)
+## Tech Stack
 
-### Backend
-
-* **Java 17**
-* **Spring Boot** (enterprise-standard application framework)
-* **Spring Security + JWT** (secure API access)
-* **Maven** (dependency and build management)
-
-### Data & Performance
-
-* **PostgreSQL** (ACID-compliant relational storage)
-* **Redis** (read optimization and performance caching)
-
-### Infrastructure & Delivery
-
-* **Docker** (environment consistency)
-* **GitHub Actions** (CI/CD – planned)
-* **GitHub Issues & Kanban** (traceable project management)
-
-### Frontend (Future Scope)
-
-* **React** (internal monitoring / admin interfaces)
+| Layer | Technology |
+|---|---|
+| Language | Java 17 |
+| Framework | Spring Boot |
+| Security | Spring Security + JWT |
+| Build Tool | Maven |
+| Database | PostgreSQL |
+| Cache | Redis |
+| API Testing | Postman |
+| Frontend *(future)* | React |
 
 ---
 
-## Business Problem Being Addressed
-
-Modern banks process millions of transactions daily and must:
-
-* Ensure **data integrity and consistency**
-* Apply **risk and compliance rules deterministically**
-* Maintain **auditability and traceability**
-* Enable **efficient investigation of flagged activity**
-
-TMS is designed to simulate these real-world constraints in a controlled, portfolio-ready system.
-
----
-
-## Planned Core Capabilities
-
-> The following capabilities are **planned and documented**, and are currently being implemented.
-
-### 1. Transaction Ingestion & Validation
-
-* REST-based ingestion of financial transactions
-* Strong schema validation and normalization
-* Idempotent transaction handling
-* Persistent storage in PostgreSQL
-
-### 2. Transaction History & Retrieval
-
-* Query transactions by:
-  * Account identifier
-  * Time window
-  * Transaction amount thresholds
-  * Risk classification
-* Pagination, sorting, and filtering
-
-### 3. Rule-Based Risk Evaluation Engine
-
-* Deterministic, explainable rule execution
-* Rules evaluated synchronously during ingestion
-* Examples:
-
-  * High-value transactions
-  * Velocity-based checks
-  * Unusual transaction patterns
-
-### 4. Risk Scoring & Classification
-
-* Aggregation of rule outcomes into a numeric risk score
-* Explicit classification (LOW / MEDIUM / HIGH)
-* Persistent storage of evaluation results for audit purposes
-
-### 5. Flagged Transaction Monitoring
-
-* Retrieval of transactions requiring review
-* Foundation for future operational dashboards
-
----
-
-## High-Level Architecture (Planned)
+## Project Structure
 
 ```
-API Consumers
-      ↓
-Spring Boot REST Layer
-      ↓
-Service Layer (Business Logic)
-      ↓
-Risk Evaluation Engine
-      ↓
-PostgreSQL  ←→  Redis
-```
-
-This layered design mirrors **banking backend architectures**, prioritizing maintainability, testability, and audit readiness.
-
----
-
-## Project Structure (Planned)
-
-```
-/src/main/java/com/example/tms
+src/main/java/com/dinesh/tms/
 │
-├── controller      # API endpoints
-├── service         # Business logic
-├── repository      # Data access layer
-├── model           # Entities & DTOs
-├── security        # Authentication & authorization
-├── risk            # Rule engine & scoring
-└── config          # Application configuration
+├── user/                  # User module
+│    ├── controller/    
+│    ├── service/
+│    ├── repository/
+│    ├── dto/
+│    └── model/
+├── account/               # Account module
+├── transaction/           # Transaction module
+├── common/                # Shared entities, DTOs, and utilities
+│    └── exception/        # Custom exceptions
+├── risk/                  # Risk rule engine & scoring
+├── audit/                 # Audit & logging module
+└── config/                # App configuration
 ```
 
 ---
 
-## Current Status
+## Roadmap
 
-* [x] Business requirements defined
-* [x] Architecture aligned with enterprise banking systems
-* [x] Technology stack selected
-* [ ] Database schema implementation
-* [ ] API implementation
-* [ ] Risk engine implementation
-* [ ] Security hardening
-* [ ] Containerization
-* [ ] CI/CD pipeline
-
----
-
-## Development Roadmap
-
-1. Spring Boot project initialization
-2. Relational schema design (transactions, accounts, evaluations)
-3. Transaction ingestion APIs
-4. Deterministic rule engine implementation
-5. Redis integration for performance
-6. Secure endpoints with JWT
-7. Containerization and CI/CD
-
----
-
-## Engineering Principles
-
-* **Correctness before optimization**
-* **Explicit over implicit logic**
-* **Auditable and explainable decisions**
-* **Enterprise-grade layering and structure**
-
-These principles closely reflect how large financial institutions approach backend system design.
-
----
-
-## Disclaimer
-
-This repository represents a **design-first engineering approach**. Implementation details, APIs, and internal structures may evolve as development progresses.
-
+- [x] **Project scaffolding & architecture design**
+- [x] **User module**
+  - [x] User creation
+  - [x] User validation
+- [ ] **Account module**
+  - [x] Create & manage bank accounts
+  - [x] Account status management (active, frozen, closed)
+  - [ ] Balance tracking
+- [ ] **Transaction module**
+  - [ ] Transaction processing with ACID guarantees
+  - [ ] Idempotency key implementation
+  - [ ] Transaction history & status tracking
+  - [ ] Rollback on failure
+- [ ] **Risk module**
+  - [ ] Rule engine implementation
+  - [ ] Risk scoring per transaction
+  - [ ] Flag & block suspicious transactions
+- [ ] **Audit & Logging module**
+  - [ ] Audit trail for all account & transaction events
+  - [ ] Immutable audit log (append-only)
+  - [ ] Log authentication events (login, failed attempts, token refresh)
+  - [ ] Structured logging with correlation IDs
+  - [ ] Log shipping & monitoring integration *(e.g. ELK Stack / Grafana)*
+- [ ] **Infrastructure**
+  - [ ] Redis caching layer
+  - [ ] Docker deployment configuration
+  - [ ] Logging & health checks
+- [ ] **Testing & Docs**
+  - [ ] Unit tests
+  - [ ] Integration tests
+  - [ ] Swagger UI documentation
+- [ ] **Frontend** *(future scope)*
+  - [ ] React admin dashboard
 ---
 
 ## Author
 
-**Saidinesh P.**
-Computer Science (Co-op) @ York University
+**Saidinesh Ponraj.**  
+Computer Science (Co-op) · York University  
 Aspiring Software Engineer — Banking & FinTech Systems
 
----
-
-⭐ This project is intentionally designed to reflect **banking-grade backend engineering expectations**.
+📧 [dineshsai841@gmail.com](mailto:dineshsai841@gmail.com)
