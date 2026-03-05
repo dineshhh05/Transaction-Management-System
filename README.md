@@ -88,6 +88,7 @@ src/main/java/com/dinesh/tms/
   - [ ] Unit tests
   - [ ] Integration tests
   - [ ] Swagger UI documentation
+  - [ ] Load testing using J meter
 - [ ] **Frontend** *(future scope)*
   - [ ] React admin dashboard
 ---
