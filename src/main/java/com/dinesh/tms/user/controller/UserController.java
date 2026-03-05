@@ -30,7 +30,7 @@ public class UserController {
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest req){
         User newUser = userService.createUser(req);
 
-        UserResponse response = new UserResponse(newUser.getId(), newUser.getUsername(), newUser.getEmailID(), newUser.getFirstName(), newUser.getLastName());
+        UserResponse response = new UserResponse(newUser.getId(), newUser.getUsername(), newUser.getEmail(), newUser.getFirstName(), newUser.getLastName());
 
         return ResponseEntity
             .status(HttpStatus.CREATED)
