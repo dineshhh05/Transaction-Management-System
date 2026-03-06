@@ -9,4 +9,5 @@ import com.dinesh.tms.user.model.User;
 
 public interface UserRepository extends JpaRepository<User, UUID>{
     boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 }

@@ -2,6 +2,8 @@ package com.dinesh.tms.user.dto;
 
 import java.util.UUID;
 
+import com.dinesh.tms.user.model.User;
+
 public class UserResponse {
     private UUID id;
     private String username;
@@ -21,6 +23,10 @@ public class UserResponse {
         this.emailID = emailID;
         this.firstName = firstName;
         this.lastName = lastName;
+    }
+
+    public static UserResponse from(User user){
+        return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getFirstName(), user.getLastName());
     }
 
 

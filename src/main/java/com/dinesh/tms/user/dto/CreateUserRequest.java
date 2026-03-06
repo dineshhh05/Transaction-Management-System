@@ -6,28 +6,35 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 
 public class CreateUserRequest {
 
     @NotBlank(message = "Username is required")
+    @Size(max = 50, message = "Username cannot exceed 50 characters")
     private String username;
     
     @NotBlank(message = "Email ID is required")
     @Email(message = "Invalid Email")
-    private String emailID; 
+    @Size(max = 255, message = "Email cannot exceed 255 characters")
+    private String email; 
 
-    @NotBlank
+    @NotBlank(message = "First name is required")
+    @Size(max = 50, message = "First name cannot exceed 50 characters")
     private String firstName;  
     
-    @NotBlank
+    @NotBlank(message = "Last name is required")
+    @Size(max = 50, message = "Last name cannot exceed 50 characters")
     private String lastName;    
 
-    @NotNull
+    @NotNull(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")
     private LocalDate dateOfBirth;  
 
-    @NotBlank
+    @NotBlank(message = "Postal code is required")
+    @Pattern(regexp = "^[A-Za-z]\\d[A-Za-z]\\d[A-Za-z]\\d$", message = "Postal code must match the format, i.e. A1A1A1")
     private String postalCode;
 
 
@@ -39,11 +46,11 @@ public class CreateUserRequest {
         this.username = username;
     }
 
-    public String getEmailID() {
-        return emailID;
+    public String getEmail() {
+        return email;
     }
-    public void setEmailID(String emailID) {
-        this.emailID = emailID;
+    public void setEmail(String emailID) {
+        this.email = emailID;
     }
 
     public String getFirstName() {
