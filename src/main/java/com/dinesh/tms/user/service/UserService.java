@@ -2,6 +2,7 @@ package com.dinesh.tms.user.service;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,10 @@ public class UserService {
 
         return userRepository.findById(id)
             .orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    public List<User> getAllUsers(){
+        return userRepository.findAll();
     }
 
     @Transactional

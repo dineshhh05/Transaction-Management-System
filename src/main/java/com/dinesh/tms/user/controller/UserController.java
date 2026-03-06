@@ -1,5 +1,7 @@
 package com.dinesh.tms.user.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,10 +62,21 @@ public class UserController {
             .body(response);
     }
 
-    // @GetMapping("/get-all/")
-    // public ResponseEntity<List<UserResponse>> getAllUsers(){
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getAllUsers(){
 
-    // }
+        List<User> listOfUsers = userService.getAllUsers();
+
+        List<UserResponse> listOfUserResponses = new ArrayList<>();
+
+        for(User user : listOfUsers){
+            listOfUserResponses.add(UserResponse.from(user)) ;
+        }
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(listOfUserResponses);
+    }
 
 
 
