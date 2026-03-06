@@ -2,7 +2,7 @@ package com.dinesh.tms.user.dto;
 
 import java.time.LocalDate;
 
-import jakarta.validation.constraints.Email;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
@@ -17,16 +17,21 @@ public class CreateUserRequest {
     private String username;
     
     @NotBlank(message = "Email ID is required")
-    @Email(message = "Invalid Email")
+    @Pattern(
+        regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$",
+        message = "Invalid Email"
+    )
     @Size(max = 255, message = "Email cannot exceed 255 characters")
     private String email; 
 
     @NotBlank(message = "First name is required")
     @Size(max = 50, message = "First name cannot exceed 50 characters")
+    @Pattern(regexp = "^[A-Za-z\\s'-]+$", message = "Last name can only contain letters, spaces, hyphens and apostrophes")
     private String firstName;  
     
     @NotBlank(message = "Last name is required")
     @Size(max = 50, message = "Last name cannot exceed 50 characters")
+    @Pattern(regexp = "^[A-Za-z\\s'-]+$", message = "Last name can only contain letters, spaces, hyphens and apostrophes")
     private String lastName;    
 
     @NotNull(message = "Date of birth is required")

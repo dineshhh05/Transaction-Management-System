@@ -4,9 +4,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.dinesh.tms.account.exception.AccountNotFoundException;
 import com.dinesh.tms.common.dto.ApiError;
@@ -94,7 +97,23 @@ public class GlobalExceptionHandler {
 
 
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiError> handleInvalidFormat(HttpMessageNotReadableException ex) {
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST.value(), "INVALID_FORMAT", "Invalid or malformed request body");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiError> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST.value(), "INVALID_ARGUMENT", "Invalid value for parameter: " + ex.getName());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiError> handleNoResourceFound(NoResourceFoundException ex) {
+        ApiError error = new ApiError(HttpStatus.NOT_FOUND.value(), "NOT_FOUND", "The requested resource was not found");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
 
 
     //Unexpected error

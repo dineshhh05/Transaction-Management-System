@@ -34,7 +34,14 @@ public class UserService {
 
         validateCreateUserParams(req);
 
-        User newUser = new User(req.getUsername(), req.getEmail(), req.getFirstName(), req.getLastName(), req.getDateOfBirth(), req.getPostalCode());
+        User newUser = new User(
+            req.getUsername(), 
+            req.getEmail(), 
+            req.getFirstName(), 
+            req.getLastName(), 
+            req.getDateOfBirth(), 
+            req.getPostalCode().toUpperCase()
+        );
 
         return userRepository.save(newUser);
     }
