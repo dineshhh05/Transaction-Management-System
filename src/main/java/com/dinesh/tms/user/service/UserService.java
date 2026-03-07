@@ -49,27 +49,25 @@ public class UserService {
 
 
     public User getUserByID(UUID id){
-        
-        if (id == null) throw new IllegalArgumentException("ID cannot be null");
-
+    
         return userRepository.findById(id)
             .orElseThrow(() -> new UserNotFoundException(id));
     }
 
+    // Explore Pagination for scalability
     public List<User> getAllUsers(){
         return userRepository.findAll();
     }
 
+
+
     @Transactional
     public void deleteUserById(UUID id){
 
-        if (id == null) throw new IllegalArgumentException("ID cannot be null");
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new UserNotFoundException(id));
 
-        if(userRepository.existsById(id)){
-            userRepository.deleteById(id);
-        } else {
-            throw new UserNotFoundException(id);
-        }
+        userRepository.delete(user);
     }
 
 

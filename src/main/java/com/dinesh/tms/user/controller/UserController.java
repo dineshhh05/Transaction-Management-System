@@ -1,5 +1,7 @@
 package com.dinesh.tms.user.controller;
 
+// import java.math.BigDecimal;
+// import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +17,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dinesh.tms.account.dto.AccountResponse;
+import com.dinesh.tms.account.model.Account;
+// import com.dinesh.tms.account.model.AccountCurrency;
+// import com.dinesh.tms.account.model.AccountStatus;
+// import com.dinesh.tms.account.model.AccountType;
+import com.dinesh.tms.account.service.AccountService;
 import com.dinesh.tms.user.dto.CreateUserRequest;
 import com.dinesh.tms.user.dto.UserResponse;
 import com.dinesh.tms.user.model.User;
@@ -27,10 +35,12 @@ import jakarta.validation.Valid;
 public class UserController {
 
     private final UserService userService;
+    private final AccountService accountService;
 
     @Autowired
-    public UserController(UserService userService){
+    public UserController(UserService userService, AccountService accountService){
         this.userService = userService;
+        this.accountService = accountService;
     }
 
     // ---------- POST METHODS ----------
@@ -62,6 +72,7 @@ public class UserController {
             .body(response);
     }
 
+    // Explore Pagination for scalability
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers(){
 
@@ -78,6 +89,24 @@ public class UserController {
             .body(listOfUserResponses);
     }
 
+    @GetMapping("/{userId}/accounts")
+    public ResponseEntity<List<AccountResponse>> getUserAccounts(@PathVariable("userId") UUID userId){
+
+        List<Account> listOfAccounts = accountService.getAccountsByUserID(userId);
+        List<AccountResponse> listOfAccountResponse = new ArrayList<>();
+
+        for(Account account : listOfAccounts ){
+            listOfAccountResponse.add(AccountResponse.from(account));
+        }
+
+        // AccountResponse mock = new AccountResponse(UUID.randomUUID(), AccountType.SAVINGS, AccountCurrency.CAD, AccountStatus.ACTIVE, BigDecimal.ZERO, Instant.now());
+        // listOfAccountResponse.add(mock);
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(listOfAccountResponse);
+    }
+
 
 
     // ---------- DELETE METHODS ----------
@@ -90,3 +119,4 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 }
+

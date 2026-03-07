@@ -26,7 +26,7 @@ public class CreateUserRequest {
 
     @NotBlank(message = "First name is required")
     @Size(max = 50, message = "First name cannot exceed 50 characters")
-    @Pattern(regexp = "^[A-Za-z\\s'-]+$", message = "Last name can only contain letters, spaces, hyphens and apostrophes")
+    @Pattern(regexp = "^[A-Za-z\\s'-]+$", message = "First name can only contain letters, spaces, hyphens and apostrophes")
     private String firstName;  
     
     @NotBlank(message = "Last name is required")
@@ -41,6 +41,22 @@ public class CreateUserRequest {
     @NotBlank(message = "Postal code is required")
     @Pattern(regexp = "^[A-Za-z]\\d[A-Za-z]\\d[A-Za-z]\\d$", message = "Postal code must match the format, i.e. A1A1A1")
     private String postalCode;
+
+    public CreateUserRequest(
+        String username,
+        String email,
+        String firstName,
+        String lastName,
+        LocalDate dateOfBirth,
+        String postalCode
+    ){
+        this.username = username;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
+        this.postalCode = postalCode;
+    }
 
 
     // Getters and Setters

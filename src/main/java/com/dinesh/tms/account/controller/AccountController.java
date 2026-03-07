@@ -12,8 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dinesh.tms.account.model.Account;
+import com.dinesh.tms.account.model.AccountType;
 import com.dinesh.tms.account.repository.AccountRepository;
 import com.dinesh.tms.account.service.AccountService;
+import com.dinesh.tms.user.model.User;
+import com.dinesh.tms.user.repository.UserRepository;
+import com.dinesh.tms.user.service.UserService;
 
 @RestController
 @RequestMapping("/account")
@@ -23,14 +27,17 @@ public class AccountController {
     // private final AccountRepository accountRepository;
 
     @Autowired
-    public AccountController(AccountService accountService, AccountRepository accountRepository){
+    public AccountController(AccountService accountService){
         this.accountService = accountService;
         // this.accountRepository = accountRepository;
     }
 
     // @PostMapping("/create")
-    // public Account createAccount(@RequestBody String firstname, String lastname, String username, String emailID){
-    //     return accountService.addAccount(firstname, lastname, username, emailID);
+    // public Account createAccount(@RequestBody AccountType accountType, UUID userID){
+
+    //     User owner = userService.getUserByID(userID);
+
+    //     return accountService.addAccount(accountType, owner);
     // };
 
 
