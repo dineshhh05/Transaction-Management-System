@@ -1,7 +1,5 @@
 package com.dinesh.tms.user.controller;
 
-// import java.math.BigDecimal;
-// import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -19,9 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dinesh.tms.account.dto.AccountResponse;
 import com.dinesh.tms.account.model.Account;
-// import com.dinesh.tms.account.model.AccountCurrency;
-// import com.dinesh.tms.account.model.AccountStatus;
-// import com.dinesh.tms.account.model.AccountType;
 import com.dinesh.tms.account.service.AccountService;
 import com.dinesh.tms.user.dto.CreateUserRequest;
 import com.dinesh.tms.user.dto.UserResponse;
@@ -98,9 +93,6 @@ public class UserController {
         for(Account account : listOfAccounts ){
             listOfAccountResponse.add(AccountResponse.from(account));
         }
-
-        // AccountResponse mock = new AccountResponse(UUID.randomUUID(), AccountType.SAVINGS, AccountCurrency.CAD, AccountStatus.ACTIVE, BigDecimal.ZERO, Instant.now());
-        // listOfAccountResponse.add(mock);
 
         return ResponseEntity
             .status(HttpStatus.OK)
