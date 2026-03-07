@@ -2,15 +2,25 @@ package com.dinesh.tms.user.service;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dinesh.tms.user.dto.CreateUserRequest;
+import com.dinesh.tms.user.exception.DuplicateEmailException;
+import com.dinesh.tms.user.exception.DuplicateUsernameException;
+import com.dinesh.tms.user.exception.UnderageException;
+import com.dinesh.tms.user.exception.UserNotFoundException;
 import com.dinesh.tms.user.model.User;
 import com.dinesh.tms.user.repository.UserRepository;
 
+
+
 @Service
+@Transactional(readOnly = true)
 public class UserService {
     private final UserRepository userRepository;
     
@@ -19,26 +29,63 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+
+    @Transactional
     public User createUser(CreateUserRequest req){
 
         validateCreateUserParams(req);
 
-        User newUser = new User(req.getUsername(), req.getEmailID(), req.getFirstName(), req.getLastName(), req.getDateOfBirth(), req.getPostalCode());
+        User newUser = new User(
+            req.getUsername(), 
+            req.getEmail(), 
+            req.getFirstName(), 
+            req.getLastName(), 
+            req.getDateOfBirth(), 
+            req.getPostalCode().toUpperCase()
+        );
 
         return userRepository.save(newUser);
     }
 
 
-    // TODO: implement custom exceptions
-    public void validateCreateUserParams(CreateUserRequest req) {
+    public User getUserByID(UUID id){
+    
+        return userRepository.findById(id)
+            .orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    // Explore Pagination for scalability
+    public List<User> getAllUsers(){
+        return userRepository.findAll();
+    }
+
+
+
+    @Transactional
+    public void deleteUserById(UUID id){
+
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new UserNotFoundException(id));
+
+        userRepository.delete(user);
+    }
+
+
+    // ---------- HELPER FUNCTIONS ----------
+
+    private void validateCreateUserParams(CreateUserRequest req) {
 
         if(userRepository.existsByUsername(req.getUsername())){
-            throw new IllegalArgumentException("Username already exists.");
+            throw new DuplicateUsernameException(req.getUsername());
+        }
+
+        if(userRepository.existsByEmail(req.getEmail())){
+            throw new DuplicateEmailException(req.getEmail());
         }
 
         int age = Period.between(req.getDateOfBirth(), LocalDate.now()).getYears();
-        if(age <= 18){
-            throw new IllegalArgumentException("Age must be greater than 18 years.");
+        if(age < 18){
+            throw new UnderageException();
         }
     }
 
