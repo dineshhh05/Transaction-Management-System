@@ -12,6 +12,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.dinesh.tms.account.exception.AccountNotFoundException;
+import com.dinesh.tms.account.exception.InsufficientFundsException;
 import com.dinesh.tms.common.dto.ApiError;
 import com.dinesh.tms.user.exception.DuplicateEmailException;
 import com.dinesh.tms.user.exception.DuplicateUsernameException;
@@ -91,10 +92,25 @@ public class GlobalExceptionHandler {
             .body(error);
     }
 
+    @ExceptionHandler(InvalidAmountException.class)
+    public ResponseEntity<ApiError> handleInvalidAmountException(InvalidAmountException ex){
+        
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST.value(), "INVALID_AMOUNT", ex.getMessage());
+        
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(error);
+    }
 
+    @ExceptionHandler(InsufficientFundsException.class)
+    public ResponseEntity<ApiError> handleInsufficientFundsException(InsufficientFundsException ex){
 
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST.value(), "INSUFFICIENT_FUNDS", ex.getMessage());
 
-
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(error);
+    }
 
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

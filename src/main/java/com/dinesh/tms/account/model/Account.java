@@ -6,6 +6,8 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.dinesh.tms.account.exception.InsufficientFundsException;
+import com.dinesh.tms.common.exception.InvalidAmountException;
 import com.dinesh.tms.user.model.User;
 
 import jakarta.persistence.Column;
@@ -23,19 +25,19 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 
+
 @Entity
 @Table(name = "accounts")
 public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(unique = true, nullable = false)
     private UUID id;
 
     @Column(unique = true, nullable = false)
     private Long accountNumber;
 
-    // Account(M) <----> (1)User
+    // Account(M) <----> (1)Owner (User)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
@@ -55,18 +57,44 @@ public class Account {
     @Column(precision = 19, scale = 2, nullable = false)
     private BigDecimal currentBalance;
 
-    @Version
-    private Long version;
 
     @Column(nullable = false)
     private Instant createdAt;        
-    
-    private Instant closedAt;
 
     @Column(nullable = false)
     private Instant updatedAt;
+
+    private Instant closedAt;
+
+    @Version
+    private Long version;
     
-    
+
+
+    // No-args constructor
+    protected Account(){}
+
+    // Example Account
+    //  id              =       1h1h2h-2323h4-434h34ks-23h-3xhu4435h-sd292h3
+    //  accountNumber   =       64389 77830
+    //  owner_id        =       j43928-t34872-54v345-23654363h-65vert345-her
+    //  accountType     =       SAVINGS
+    //  status          =       ACTIVE
+    //  currency        =       CAD
+    //  currentBalance  =       7839.44
+    //  version         =       1
+    //  createdAt       =       1982-08-30
+    //  updatedAt       =       2026-09-20
+
+    public Account(AccountType accountType, User owner, AccountCurrency currency) {
+        this.accountNumber = ThreadLocalRandom.current().nextLong(1000000000L, 9999999999L);
+        this.owner = owner;
+        this.accountType = accountType;
+        this.status = AccountStatus.ACTIVE;
+        this.currency = currency;
+        this.currentBalance = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_EVEN);
+    }
+
     @PrePersist
     public void onCreate(){
         this.createdAt = Instant.now();
@@ -78,32 +106,6 @@ public class Account {
         this.updatedAt = Instant.now();
     }
 
-
-    // No-args constructor
-    protected Account(){}
-
-    // Example ---->  Account
-    //  id              =       1h1h2h-2323h4-434h34ks-23h-3xhu4435h-sd292h3
-    //  accountNumber   =       643897 78302
-    //  owner_id        =       j43928-t34872-54v345-23654363h-65vert345-her
-    //  accountType     =       SAVINGS
-    //  status          =       ACTIVE
-    //  currency        =       CAD
-    //  currentBalance  =       7839.44
-    //  version         =       1
-    //  createdAt       =       1982-08-30
-    //  updatedAt       =       2026-09-20
-
-    public Account(AccountType accountType, User owner) {
-        this.accountNumber = ThreadLocalRandom.current().nextLong(1000000000L, 9999999999L);
-        this.owner = owner;
-        this.accountType = accountType;
-        this.status = AccountStatus.ACTIVE;
-        this.currency = AccountCurrency.CAD;
-        this.currentBalance = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_EVEN);
-        this.createdAt = Instant.now();
-    }
-
     public void applyCredit(BigDecimal amount){
         amount = validateAmount(amount);
         this.currentBalance = currentBalance.add(amount);
@@ -111,8 +113,9 @@ public class Account {
 
     public void applyDebit(BigDecimal amount){
         amount = validateAmount(amount);
+       
         if(this.currentBalance.compareTo(amount) < 0){
-            throw new IllegalArgumentException("Insufficient funds");
+            throw new InsufficientFundsException();
         }
 
         this.currentBalance = currentBalance.subtract(amount);
@@ -128,6 +131,10 @@ public class Account {
     public Instant getClosedAt() {return closedAt;}
     public AccountStatus getStatus() {return status;}
     public Long getVersion() {return version;}
+    public Long getAccountNumber() {return accountNumber;}
+    public Instant getUpdatedAt() {return updatedAt;}
+
+
 
     // Setters
     public void setStatus(AccountStatus status) {this.status = status;}
@@ -136,18 +143,20 @@ public class Account {
 
 
     // Internal validation helper
-    // TODO: Custom exceptions needed here
     private BigDecimal validateAmount(BigDecimal amount) {
+        
         if (amount == null) {
-            throw new IllegalArgumentException("Amount cannot be null");
+            throw new InvalidAmountException("Amount cannot be null");
         }
         if (amount.signum() <= 0) {
-            throw new IllegalArgumentException("Amount must be positive");
+            throw new InvalidAmountException("Amount must be positive");
         }
 
         // ensure 2 decimal places
         return amount.setScale(2, RoundingMode.HALF_EVEN);
     }
+
+
 
 
     
