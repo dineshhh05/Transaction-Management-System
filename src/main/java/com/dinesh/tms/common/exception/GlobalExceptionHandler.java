@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import com.dinesh.tms.account.exception.AccessClosedAccountException;
 import com.dinesh.tms.account.exception.AccountNotFoundException;
+import com.dinesh.tms.account.exception.DuplicateAccountTypeException;
 import com.dinesh.tms.account.exception.InsufficientFundsException;
 import com.dinesh.tms.common.dto.ApiError;
 import com.dinesh.tms.user.exception.DuplicateEmailException;
@@ -109,6 +111,26 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
+            .body(error);
+    }
+
+    @ExceptionHandler(DuplicateAccountTypeException.class)
+    public ResponseEntity<ApiError> handleDuplicateAccountException(DuplicateAccountTypeException ex){
+
+        ApiError error = new ApiError(HttpStatus.CONFLICT.value(), "ACCOUNT_TYPE_LIMIT", ex.getMessage());
+
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(error);
+    }
+
+    @ExceptionHandler(AccessClosedAccountException.class)
+    public ResponseEntity<ApiError> handleDuplicateAccountException(AccessClosedAccountException ex){
+
+        ApiError error = new ApiError(HttpStatus.CONFLICT.value(), "ILLEGAL_ACCESS_TO_CLOSED_ACCOUNT", ex.getMessage());
+
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
             .body(error);
     }
 

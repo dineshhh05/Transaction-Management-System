@@ -23,11 +23,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
 
 
 @Entity
-@Table(name = "accounts")
+@Table(
+    name = "accounts",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"owner_id", "account_type"})
+)
 public class Account {
 
     @Id
@@ -156,8 +160,4 @@ public class Account {
         return amount.setScale(2, RoundingMode.HALF_EVEN);
     }
 
-
-
-
-    
 }

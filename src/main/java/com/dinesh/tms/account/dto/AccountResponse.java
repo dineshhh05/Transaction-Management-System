@@ -13,6 +13,7 @@ import com.dinesh.tms.account.model.AccountType;
 public class AccountResponse {
     
     private UUID id;
+    private Long accountNumber;
     private AccountType accountType;
     private AccountCurrency currency;
     private AccountStatus status;
@@ -22,6 +23,7 @@ public class AccountResponse {
 
     public AccountResponse(
         UUID id,
+        Long accountNumber,
         AccountType accountType,
         AccountCurrency currency,
         AccountStatus status,
@@ -29,6 +31,7 @@ public class AccountResponse {
         Instant createdAt
     ) {
         this.id = id;
+        this.accountNumber = accountNumber;
         this.accountType = accountType;
         this.currency = currency;
         this.status = status;
@@ -40,6 +43,7 @@ public class AccountResponse {
     public static AccountResponse from(Account account){
         return new AccountResponse(
             account.getID(), 
+            account.getAccountNumber(),
             account.getAccountType(), 
             account.getAccountCurrency(), 
             account.getStatus(), 
@@ -53,6 +57,11 @@ public class AccountResponse {
     public UUID getId() {
         return id;
     }
+
+    public Long getAccountNumber() {
+        return accountNumber;
+    }
+
 
     public AccountType getAccountType() {
         return accountType;
