@@ -40,8 +40,7 @@ public class AccountController {
     }
 
     // ---------- POST METHODS ----------
-
-    // Create Account
+    
     @PostMapping
     public ResponseEntity<AccountResponse> createAccount(@Valid @RequestBody CreateAccountRequest req){
 
@@ -53,7 +52,6 @@ public class AccountController {
             .status(HttpStatus.CREATED)
             .body(res);
     }
-
 
 
     // ---------- GET METHODS ----------
@@ -102,7 +100,7 @@ public class AccountController {
     }
 
     @PutMapping("/{accountId}/debit")
-    public ResponseEntity<AccountResponse> debitCredit(@PathVariable("accountId") UUID accountId, @RequestBody @Valid ApplyDebitRequest req){
+    public ResponseEntity<AccountResponse> applyDebit(@PathVariable("accountId") UUID accountId, @RequestBody @Valid ApplyDebitRequest req){
 
         Account account = accountService.applyDebit(accountId, req.getDebitAmount());
 
@@ -130,10 +128,10 @@ public class AccountController {
 
 
     // ---------- DELETE METHODS ----------
-    @DeleteMapping("/{id}")
-    public ResponseEntity<AccountResponse> closeAccount(@PathVariable("id") UUID id){
+    @DeleteMapping("/{accountId}")
+    public ResponseEntity<AccountResponse> closeAccount(@PathVariable("accountId") UUID accountId){
 
-        Account account = accountService.deleteAccountByID(id);
+        Account account = accountService.closeAccountByID(accountId);
 
         AccountResponse res = AccountResponse.from(account);
 

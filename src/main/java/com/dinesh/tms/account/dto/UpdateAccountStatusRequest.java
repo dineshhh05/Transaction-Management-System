@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 public class UpdateAccountStatusRequest {
     
     @NotNull
-    AccountStatus newStatus;
+    private AccountStatus newStatus;
 
     public AccountStatus getNewStatus() {
         return newStatus;

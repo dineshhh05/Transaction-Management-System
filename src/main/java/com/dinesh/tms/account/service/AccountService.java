@@ -6,13 +6,16 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dinesh.tms.account.dto.CreateAccountRequest;
-import com.dinesh.tms.account.exception.AccessClosedAccountException;
+import com.dinesh.tms.account.exception.AccountBalanceNotZeroException;
 import com.dinesh.tms.account.exception.AccountNotFoundException;
+import com.dinesh.tms.account.exception.ConcurrentAccountAccessException;
 import com.dinesh.tms.account.exception.DuplicateAccountTypeException;
+import com.dinesh.tms.account.exception.RetryLimitExceededException;
 import com.dinesh.tms.account.model.Account;
 import com.dinesh.tms.account.model.AccountStatus;
 import com.dinesh.tms.account.repository.AccountRepository;
@@ -80,9 +83,7 @@ public class AccountService {
         Account account = accountRepository.findById(accountId)
             .orElseThrow(() -> new AccountNotFoundException(accountId));
 
-        if(account.getStatus() == AccountStatus.CLOSED){
-            throw new AccessClosedAccountException();
-        }
+        account.ensureUpdateable();
 
         account.setStatus(newStatus);
 
@@ -92,45 +93,74 @@ public class AccountService {
     @Transactional
     public Account applyCredit(UUID accountId, BigDecimal creditAmount){
 
-        Account account = accountRepository.findById(accountId)
-            .orElseThrow(() -> new AccountNotFoundException(accountId));
+        int maxRetries = 3;
 
-        if( account.getStatus() == AccountStatus.CLOSED ||
-           account.getStatus() == AccountStatus.FROZEN ||
-           account.getStatus() == AccountStatus.SUSPENDED
-        ){
-            throw new AccessClosedAccountException();
+        for(int i=1; i<=maxRetries; i++){
+            try {
+                Account account = accountRepository.findById(accountId)
+                    .orElseThrow(() -> new AccountNotFoundException(accountId));
+
+                account.ensureTransactionAllowed();
+                account.applyCredit(creditAmount);
+
+                return accountRepository.save(account);
+
+            } catch (ObjectOptimisticLockingFailureException e) {
+
+                if (i == maxRetries) {
+                    throw new RetryLimitExceededException("Transaction retry limit exceeded, try again later", e);
+                }
+
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException ignored) {}
+            }
         }
 
-        account.applyCredit(creditAmount);
-
-        return accountRepository.save(account);
+        throw new IllegalStateException();
     }
 
     @Transactional
     public Account applyDebit(UUID accountId, BigDecimal debitAmount){
 
-        Account account = accountRepository.findById(accountId)
-            .orElseThrow(() -> new AccountNotFoundException(accountId));
+        int maxRetries = 3;
 
-        if( account.getStatus() == AccountStatus.CLOSED ||
-            account.getStatus() == AccountStatus.FROZEN ||
-            account.getStatus() == AccountStatus.SUSPENDED
-        ){
-            throw new AccessClosedAccountException();
+        for(int i=1; i<=maxRetries; i++){
+            try {
+                Account account = accountRepository.findById(accountId)
+                    .orElseThrow(() -> new AccountNotFoundException(accountId));
+
+                account.ensureTransactionAllowed();
+
+                account.applyDebit(debitAmount);
+
+                return accountRepository.save(account);
+                
+            } catch (ObjectOptimisticLockingFailureException e) {
+
+                if(i == maxRetries){
+                    throw new RetryLimitExceededException("Transaction retry limit exceeded, try again later", e);
+                }
+
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException ignored) {}
+            }
         }
 
-        account.applyDebit(debitAmount);
-
-        return accountRepository.save(account);
+        throw new IllegalStateException();
     }
 
 
     @Transactional
-    public Account deleteAccountByID(UUID id){
+    public Account closeAccountByID(UUID id){
 
         Account account = accountRepository.findById(id)
             .orElseThrow(() -> new AccountNotFoundException(id));
+
+        if (account.getCurrentBalance().compareTo(BigDecimal.ZERO) > 0 ) {
+            throw new AccountBalanceNotZeroException();
+        }
 
         account.setClosedAt(Instant.now());
         account.setStatus(AccountStatus.CLOSED);

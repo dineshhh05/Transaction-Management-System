@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.dinesh.tms.account.exception.AccountOperationNotAllowedException;
 import com.dinesh.tms.account.exception.InsufficientFundsException;
 import com.dinesh.tms.common.exception.InvalidAmountException;
 import com.dinesh.tms.user.model.User;
@@ -125,8 +126,23 @@ public class Account {
         this.currentBalance = currentBalance.subtract(amount);
     }
 
+    public void ensureTransactionAllowed(){
+        if( this.status == AccountStatus.CLOSED || 
+            this.status == AccountStatus.FROZEN ||
+            this.status == AccountStatus.SUSPENDED
+        ) {
+            throw new AccountOperationNotAllowedException();
+        }
+    }
+
+    public void ensureUpdateable(){
+        if( this.status == AccountStatus.CLOSED) {
+            throw new AccountOperationNotAllowedException();
+        }
+    }
+
     // Getters 
-    public UUID getID() {return id;}
+    public UUID getId() {return id;}
     public User getOwner() {return owner;}
     public AccountType getAccountType() {return accountType;}
     public AccountCurrency getAccountCurrency() {return currency;}

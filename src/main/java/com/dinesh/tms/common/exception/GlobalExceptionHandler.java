@@ -11,10 +11,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import com.dinesh.tms.account.exception.AccessClosedAccountException;
+import com.dinesh.tms.account.exception.AccountOperationNotAllowedException;
+import com.dinesh.tms.account.exception.ConcurrentAccountAccessException;
+import com.dinesh.tms.account.exception.AccountBalanceNotZeroException;
 import com.dinesh.tms.account.exception.AccountNotFoundException;
 import com.dinesh.tms.account.exception.DuplicateAccountTypeException;
 import com.dinesh.tms.account.exception.InsufficientFundsException;
+import com.dinesh.tms.account.exception.RetryLimitExceededException;
 import com.dinesh.tms.common.dto.ApiError;
 import com.dinesh.tms.user.exception.DuplicateEmailException;
 import com.dinesh.tms.user.exception.DuplicateUsernameException;
@@ -124,10 +127,40 @@ public class GlobalExceptionHandler {
             .body(error);
     }
 
-    @ExceptionHandler(AccessClosedAccountException.class)
-    public ResponseEntity<ApiError> handleDuplicateAccountException(AccessClosedAccountException ex){
+    @ExceptionHandler(AccountOperationNotAllowedException.class)
+    public ResponseEntity<ApiError> handleAccountOperationNotAllowedException(AccountOperationNotAllowedException ex){
 
-        ApiError error = new ApiError(HttpStatus.CONFLICT.value(), "ILLEGAL_ACCESS_TO_CLOSED_ACCOUNT", ex.getMessage());
+        ApiError error = new ApiError(HttpStatus.CONFLICT.value(), "ACCOUNT_LOCKED", ex.getMessage());
+
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(error);
+    }
+
+    @ExceptionHandler(AccountBalanceNotZeroException.class)
+    public ResponseEntity<ApiError> handleAccountBalanceNotZeroException(AccountBalanceNotZeroException ex){
+
+        ApiError error = new ApiError(HttpStatus.CONFLICT.value(), "ACCOUNT_BALANCE_NOT_ZERO", ex.getMessage());
+
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(error);
+    }
+
+    @ExceptionHandler(RetryLimitExceededException.class)
+    public ResponseEntity<ApiError> handleRetryLimitExceededException(RetryLimitExceededException ex){
+
+        ApiError error = new ApiError(HttpStatus.CONFLICT.value(), "RETRY_LIMIT_EXCEEDED", ex.getMessage());
+
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(error);
+    }
+
+    @ExceptionHandler(ConcurrentAccountAccessException.class)
+    public ResponseEntity<ApiError> handleConcurrentAccountAccessException(ConcurrentAccountAccessException ex){
+
+        ApiError error = new ApiError(HttpStatus.CONFLICT.value(), "CONCURRENT_ACCESS_FAILED", ex.getMessage());
 
         return ResponseEntity
             .status(HttpStatus.CONFLICT)

@@ -11,7 +11,7 @@ public class ApplyDebitRequest {
     @NotNull(message = "Amount cannot be null")
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0")
     @Digits(integer = 17, fraction = 2, message = "Amount must have at most 2 decimal places")
-    BigDecimal debitAmount;
+    private BigDecimal debitAmount;
 
     public BigDecimal getDebitAmount() {
         return debitAmount;
