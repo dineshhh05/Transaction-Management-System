@@ -11,7 +11,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+import com.dinesh.tms.account.exception.AccountOperationNotAllowedException;
+import com.dinesh.tms.account.exception.ConcurrentAccountAccessException;
+import com.dinesh.tms.account.exception.AccountBalanceNotZeroException;
 import com.dinesh.tms.account.exception.AccountNotFoundException;
+import com.dinesh.tms.account.exception.DuplicateAccountTypeException;
+import com.dinesh.tms.account.exception.InsufficientFundsException;
+import com.dinesh.tms.account.exception.RetryLimitExceededException;
 import com.dinesh.tms.common.dto.ApiError;
 import com.dinesh.tms.user.exception.DuplicateEmailException;
 import com.dinesh.tms.user.exception.DuplicateUsernameException;
@@ -91,10 +97,75 @@ public class GlobalExceptionHandler {
             .body(error);
     }
 
+    @ExceptionHandler(InvalidAmountException.class)
+    public ResponseEntity<ApiError> handleInvalidAmountException(InvalidAmountException ex){
+        
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST.value(), "INVALID_AMOUNT", ex.getMessage());
+        
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(error);
+    }
 
+    @ExceptionHandler(InsufficientFundsException.class)
+    public ResponseEntity<ApiError> handleInsufficientFundsException(InsufficientFundsException ex){
 
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST.value(), "INSUFFICIENT_FUNDS", ex.getMessage());
 
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(error);
+    }
 
+    @ExceptionHandler(DuplicateAccountTypeException.class)
+    public ResponseEntity<ApiError> handleDuplicateAccountException(DuplicateAccountTypeException ex){
+
+        ApiError error = new ApiError(HttpStatus.CONFLICT.value(), "ACCOUNT_TYPE_LIMIT", ex.getMessage());
+
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(error);
+    }
+
+    @ExceptionHandler(AccountOperationNotAllowedException.class)
+    public ResponseEntity<ApiError> handleAccountOperationNotAllowedException(AccountOperationNotAllowedException ex){
+
+        ApiError error = new ApiError(HttpStatus.CONFLICT.value(), "ACCOUNT_LOCKED", ex.getMessage());
+
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(error);
+    }
+
+    @ExceptionHandler(AccountBalanceNotZeroException.class)
+    public ResponseEntity<ApiError> handleAccountBalanceNotZeroException(AccountBalanceNotZeroException ex){
+
+        ApiError error = new ApiError(HttpStatus.CONFLICT.value(), "ACCOUNT_BALANCE_NOT_ZERO", ex.getMessage());
+
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(error);
+    }
+
+    @ExceptionHandler(RetryLimitExceededException.class)
+    public ResponseEntity<ApiError> handleRetryLimitExceededException(RetryLimitExceededException ex){
+
+        ApiError error = new ApiError(HttpStatus.CONFLICT.value(), "RETRY_LIMIT_EXCEEDED", ex.getMessage());
+
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(error);
+    }
+
+    @ExceptionHandler(ConcurrentAccountAccessException.class)
+    public ResponseEntity<ApiError> handleConcurrentAccountAccessException(ConcurrentAccountAccessException ex){
+
+        ApiError error = new ApiError(HttpStatus.CONFLICT.value(), "CONCURRENT_ACCESS_FAILED", ex.getMessage());
+
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(error);
+    }
 
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
