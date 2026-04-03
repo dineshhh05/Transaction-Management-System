@@ -8,12 +8,12 @@ import java.util.UUID;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dinesh.tms.account.dto.CreateAccountRequest;
 import com.dinesh.tms.account.exception.AccountBalanceNotZeroException;
 import com.dinesh.tms.account.exception.AccountNotFoundException;
-import com.dinesh.tms.account.exception.ConcurrentAccountAccessException;
 import com.dinesh.tms.account.exception.DuplicateAccountTypeException;
 import com.dinesh.tms.account.exception.RetryLimitExceededException;
 import com.dinesh.tms.account.model.Account;
@@ -30,11 +30,13 @@ public class AccountService {
     
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final TransactionHelper transactionHelper;
 
     // Constructor injection
-    public AccountService(AccountRepository accountRepository, UserRepository userRepository){
+    public AccountService(AccountRepository accountRepository, UserRepository userRepository, TransactionHelper transactionHelper){
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
+        this.transactionHelper = transactionHelper;
     }
 
 
@@ -90,20 +92,15 @@ public class AccountService {
         return accountRepository.save(account);
     }
 
-    @Transactional
+    @Transactional(propagation=Propagation.NOT_SUPPORTED)
     public Account applyCredit(UUID accountId, BigDecimal creditAmount){
 
         int maxRetries = 3;
 
         for(int i=1; i<=maxRetries; i++){
             try {
-                Account account = accountRepository.findById(accountId)
-                    .orElseThrow(() -> new AccountNotFoundException(accountId));
 
-                account.ensureTransactionAllowed();
-                account.applyCredit(creditAmount);
-
-                return accountRepository.save(account);
+                return transactionHelper.attemptCredit(accountId, creditAmount);
 
             } catch (ObjectOptimisticLockingFailureException e) {
 
@@ -112,29 +109,27 @@ public class AccountService {
                 }
 
                 try {
-                    Thread.sleep(10);
-                } catch (InterruptedException ignored) {}
+                    Thread.sleep(10L * i);
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                }
             }
         }
 
-        throw new IllegalStateException();
+        throw new IllegalStateException("Unreachable");
     }
 
-    @Transactional
+    
+
+    @Transactional(propagation=Propagation.NOT_SUPPORTED)
     public Account applyDebit(UUID accountId, BigDecimal debitAmount){
 
         int maxRetries = 3;
 
         for(int i=1; i<=maxRetries; i++){
             try {
-                Account account = accountRepository.findById(accountId)
-                    .orElseThrow(() -> new AccountNotFoundException(accountId));
 
-                account.ensureTransactionAllowed();
-
-                account.applyDebit(debitAmount);
-
-                return accountRepository.save(account);
+                return transactionHelper.attemptDebit(accountId, debitAmount);
                 
             } catch (ObjectOptimisticLockingFailureException e) {
 
@@ -143,20 +138,25 @@ public class AccountService {
                 }
 
                 try {
-                    Thread.sleep(10);
-                } catch (InterruptedException ignored) {}
+                    Thread.sleep(10L * i);
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                }
             }
         }
 
-        throw new IllegalStateException();
+        throw new IllegalStateException("Unreachable");
     }
 
+    
 
     @Transactional
     public Account closeAccountByID(UUID id){
 
         Account account = accountRepository.findById(id)
             .orElseThrow(() -> new AccountNotFoundException(id));
+
+        account.ensureUpdateable();
 
         if (account.getCurrentBalance().compareTo(BigDecimal.ZERO) > 0 ) {
             throw new AccountBalanceNotZeroException();

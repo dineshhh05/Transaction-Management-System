@@ -12,7 +12,9 @@ import com.dinesh.tms.account.model.AccountType;
 // Response DTO, Read only
 public class AccountResponse {
     
-    private UUID id;
+    private UUID accountId;
+    private UUID ownerId;
+    private String ownerUsername;
     private Long accountNumber;
     private AccountType accountType;
     private AccountCurrency currency;
@@ -22,7 +24,9 @@ public class AccountResponse {
 
 
     public AccountResponse(
-        UUID id,
+        UUID accountId,
+        UUID ownerId,
+        String ownerUsername,
         Long accountNumber,
         AccountType accountType,
         AccountCurrency currency,
@@ -30,7 +34,9 @@ public class AccountResponse {
         BigDecimal currentBalance,
         Instant createdAt
     ) {
-        this.id = id;
+        this.accountId = accountId;
+        this.ownerId = ownerId;
+        this.ownerUsername = ownerUsername;
         this.accountNumber = accountNumber;
         this.accountType = accountType;
         this.currency = currency;
@@ -42,7 +48,9 @@ public class AccountResponse {
     // DTO Mapper 
     public static AccountResponse from(Account account){
         return new AccountResponse(
-            account.getId(), 
+            account.getId(),
+            account.getOwner().getId(),
+            account.getOwner().getUsername(), 
             account.getAccountNumber(),
             account.getAccountType(), 
             account.getAccountCurrency(), 
@@ -54,8 +62,12 @@ public class AccountResponse {
     
     
     // Getters
-    public UUID getId() {
-        return id;
+    public UUID getOwnerId() {
+        return ownerId;
+    }
+
+    public UUID getAccountId() {
+        return accountId;
     }
 
     public Long getAccountNumber() {
@@ -81,6 +93,10 @@ public class AccountResponse {
    
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public String getOwnerUsername() {
+        return ownerUsername;
     }
 
     
