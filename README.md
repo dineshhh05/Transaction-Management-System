@@ -34,7 +34,7 @@ A high-fidelity system designed to simulate real-world banking operations — se
 ## Project Structure
 
 ```
-src/main/java/com/dinesh/tms/
+src/main/java/com/{user}/tms/
 │
 ├── user/                  # User module
 │    ├── controller/    
@@ -44,6 +44,7 @@ src/main/java/com/dinesh/tms/
 │    └── model/
 ├── account/               # Account module
 ├── transaction/           # Transaction module
+├── ledger/                # Ledger module
 ├── common/                # Shared entities, DTOs, and utilities
 │    └── exception/        # Custom exceptions
 ├── risk/                  # Risk rule engine & scoring
