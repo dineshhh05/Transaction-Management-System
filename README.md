@@ -1,5 +1,8 @@
 # Transaction Management System (TMS)
 
+<img width="1000" alt="System Architecture Diagram" src="/architecture/SystemArchitectureDiagram.png" />
+
+
 A high-fidelity system designed to simulate real-world banking operations — secure, reliable, and consistent handling of money transfers. TMS supports concurrent transactions, prevents duplicates, and maintains integrity under failure scenarios, demonstrating production-grade financial system behavior.
 
 ---
